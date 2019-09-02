@@ -2,16 +2,18 @@ import React, { useState } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { Input, Button } from 'react-native-elements'
 import axios from 'axios'
+import firebase from 'firebase'
 
 const ROOT_URL = 'https://us-central1-one-time-bb6dd.cloudfunctions.net'
 
-const SignUpForm = () => {
+const SignInForm = () => {
     const { phone, setPhone } = useState('')
+    const { code, setCode } = useState('')
 
     const handleSubmit = async () => {
         try {
-            await axios.post(`${ROOT_URL}/createUser`, { phone })
-            await axios.post(`${ROOT_URL}/requestOneTimePassword`, { phone })
+            const { data } = await axios.post(`${ROOT_URL}/createUser`, { phone, code })
+            firebase.auth().signInWithCustomToken(data.token)
         } catch (err) {
             console.log(err)
         }
@@ -23,6 +25,13 @@ const SignUpForm = () => {
                 label="Enter Your Phone Number" 
                 onChangeText={setPhone}
                 value={phone}
+            />
+        </View>
+        <View style={styles.input}>
+            <Input 
+                label="Enter Your Code" 
+                onChangeText={setCode}
+                value={code}
             />
         </View>
         <Button 
@@ -39,4 +48,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default SignUpForm
+export default SignInForm
